@@ -1,5 +1,7 @@
+using ApiDevBP.Contracts;
 using ApiDevBP.Entities;
 using ApiDevBP.Models;
+using ApiDevBP.Services;
 using Microsoft.AspNetCore.Mvc;
 using SQLite;
 using System.Reflection;
@@ -10,42 +12,91 @@ namespace ApiDevBP.Controllers
     [Route("[controller]")]
     public class UsersController : ControllerBase
     {
-        private readonly  SQLiteConnection _db;
-        
-        private readonly ILogger<UsersController> _logger;
-
-        public UsersController(ILogger<UsersController> logger)
+        private readonly IUserService _userService;
+        public UsersController(IUserService userService)
         {
-            _logger = logger;
-            string localDb = Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "localDb");
-            _db = new SQLiteConnection(localDb);
-            _db.CreateTable<UserEntity>();
+            _userService = userService;
         }
 
+        /// <summary>
+        /// Registra un nuevo usuario en la BD
+        /// </summary>
+        /// <param name="user">Datos del usuario a insertar en la BD</param>
+        /// <returns></returns>
         [HttpPost]
         public async Task<IActionResult> SaveUser(UserModel user)
         {
-            var result = _db.Insert(new UserEntity()
-            {
-                Name = user.Name,
-                Lastname = user.Lastname
-            });
-            return Ok(result > 0);
+            if (user == null)
+                return BadRequest();
+            var response = await _userService.Insert(user);
+            if (response.IsSuccess)
+                return Ok(response);
+
+            return BadRequest(response.Message);
         }
 
+        /// <summary>
+        /// Actualiza el registro del usuario en la BD
+        /// </summary>
+        /// <param name="userId">Id del Usuario a Modificar</param>
+        /// <param name="user">Datos del usuario actualizados</param>
+        /// <returns></returns>
+        [HttpPut("UpdateUser/{userId}")]
+        public async Task<IActionResult> UpdateUser(int userId,[FromBody] UserModel user)
+        {
+            if (user == null)
+                return BadRequest();
+            var response = await _userService.Update(user, userId);
+            if (response.IsSuccess)
+                return Ok(response);
+
+            return BadRequest(response.Message);
+
+        }
+
+        /// <summary>
+        /// Obtiene todos los usuarios de la BD
+        /// </summary>
+        /// <returns></returns>
         [HttpGet]
         public async Task<IActionResult> GetUsers()
         {
-            var users = _db.Query<UserEntity>($"Select * from Users");
-            if (users != null)
-            {
-                return Ok(users.Select(x=> new UserModel()
-                {
-                    Name = x.Name,
-                    Lastname = x.Lastname
-                }));
-            }
-            return NotFound();
+            var response =  await _userService.GetAll();
+            if (response.IsSuccess)
+                return Ok(response);
+
+            return BadRequest(response.Message);
+        }
+
+
+        /// <summary>
+        /// Elimina un usuario de la BD
+        /// </summary>
+        /// <param name="userId">Id del Usuario a Eliminar</param>
+        /// <returns></returns>
+        [HttpDelete("Delete/{userId}")]
+        public async Task<IActionResult> Delete(int userId)
+        {
+            var response = await _userService.Delete(userId);
+            if (response.IsSuccess)
+                return Ok(response);
+
+            return BadRequest(response.Message);
+        }
+
+        /// <summary>
+        /// Obtiene un usuario de la base de Datos
+        /// </summary>
+        /// <param name="userId">Id del usuario a obtener la informacion</param>
+        /// <returns></returns>
+        [HttpGet("Get/{userId}")]
+        public async Task<IActionResult> Get(int userId)
+        {
+            var response = await _userService.Get(userId);
+            if (response.IsSuccess)
+                return Ok(response);
+
+            return BadRequest(response.Message);
         }
 
     }

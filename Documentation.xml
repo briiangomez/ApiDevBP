@@ -4,5 +4,52 @@
         <name>ApiDevBP</name>
     </assembly>
     <members>
+        <member name="M:ApiDevBP.Controllers.UsersController.SaveUser(ApiDevBP.Models.UserModel)">
+            <summary>
+            Registra un nuevo usuario en la BD
+            </summary>
+            <param name="user">Datos del usuario a insertar en la BD</param>
+            <returns></returns>
+        </member>
+        <member name="M:ApiDevBP.Controllers.UsersController.UpdateUser(System.Int32,ApiDevBP.Models.UserModel)">
+            <summary>
+            Actualiza el registro del usuario en la BD
+            </summary>
+            <param name="userId">Id del Usuario a Modificar</param>
+            <param name="user">Datos del usuario actualizados</param>
+            <returns></returns>
+        </member>
+        <member name="M:ApiDevBP.Controllers.UsersController.GetUsers">
+            <summary>
+            Obtiene todos los usuarios de la BD
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:ApiDevBP.Controllers.UsersController.Delete(System.Int32)">
+            <summary>
+            Elimina un usuario de la BD
+            </summary>
+            <param name="userId">Id del Usuario a Eliminar</param>
+            <returns></returns>
+        </member>
+        <member name="M:ApiDevBP.Controllers.UsersController.Get(System.Int32)">
+            <summary>
+            Obtiene un usuario de la base de Datos
+            </summary>
+            <param name="userId">Id del usuario a obtener la informacion</param>
+            <returns></returns>
+        </member>
+        <member name="T:ApiDevBP.Migrations.InitialCreate">
+            <inheritdoc />
+        </member>
+        <member name="M:ApiDevBP.Migrations.InitialCreate.Up(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:ApiDevBP.Migrations.InitialCreate.Down(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:ApiDevBP.Migrations.InitialCreate.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
+            <inheritdoc />
+        </member>
     </members>
 </doc>

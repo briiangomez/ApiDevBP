@@ -1,6 +1,14 @@
+using ApiDevBP.Context;
+using ApiDevBP.Contracts;
+using ApiDevBP.Handlers;
+using ApiDevBP.Services;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Migrations.Operations;
+using Microsoft.Extensions.Configuration;
 using Microsoft.OpenApi.Models;
 using Serilog;
 var builder = WebApplication.CreateBuilder(args);
+var configuration = builder.Configuration;
 
 // Add services to the container.
 Log.Logger = new LoggerConfiguration()
@@ -8,10 +16,18 @@ Log.Logger = new LoggerConfiguration()
     .CreateBootstrapLogger();
 
 builder.Services.AddControllers();
+builder.Services.AddDbContext<ApiDBContext>(options =>
+        options.UseSqlite(configuration.GetConnectionString("DefaultConnection")));
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Host.UseSerilog();
+builder.Services.AddAutoMapper(typeof(Program).Assembly);
+builder.Services.AddTransient<GlobalExceptionHandler>();
+
+
+builder.Services.AddScoped<IUserService, UserService>();
+
 builder.Services.AddSwaggerGen(options =>
 {
     options.SwaggerDoc("v1", new OpenApiInfo
@@ -33,6 +49,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.UseMiddleware<GlobalExceptionHandler>();
 
 app.UseHttpsRedirection();
 
